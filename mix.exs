@@ -14,7 +14,7 @@ defmodule SecretVault.MixProject do
       deps: deps(),
       description: description(),
       package: package(),
-      name: "Pathex",
+      name: "SecretVault",
       source_url: @source,
       docs: docs(),
       dialyzer: dialyzer()
