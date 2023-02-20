@@ -1,28 +1,28 @@
 defmodule SecretVault.MixProject do
   use Mix.Project
 
-  # Change the version later
-  @version "1.0.0"
-  @source "https://github.com/spawnfest/secret_vault"
+  @version "1.1.0"
+  @source "https://github.com/SecretVault-elixir/secret_vault"
 
   def project do
     [
       app: :secret_vault,
+      name: "SecretVault",
       version: @version,
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
       package: package(),
-      name: "Pathex",
       source_url: @source,
+      homepage_url: @source,
       docs: docs(),
       dialyzer: dialyzer()
     ]
   end
 
   defp description do
-    "Secret management inside your repository"
+    "All-included solution for managing secrets in mix projects"
   end
 
   defp package do
@@ -85,7 +85,9 @@ defmodule SecretVault.MixProject do
   end
 
   defp dialyzer do
-    [plt_add_apps: [:mix]]
+    [
+      plt_add_apps: [:mix]
+    ]
   end
 
   defp groups_for_extras do
@@ -105,6 +107,7 @@ defmodule SecretVault.MixProject do
         Mix.Tasks.Scr.Create,
         Mix.Tasks.Scr.Edit,
         Mix.Tasks.Scr.Show,
+        Mix.Tasks.Scr.Audit,
         Mix.Tasks.Scr.Insert
       ],
       Ciphers: [
@@ -112,7 +115,7 @@ defmodule SecretVault.MixProject do
         SecretVault.Cipher.ErlangCrypto,
         SecretVault.Cipher.Plaintext
       ],
-      "Key Derivations": [
+      "Key Derivation": [
         SecretVault.KeyDerivation,
         SecretVault.KDFs.PBKDF2
       ]

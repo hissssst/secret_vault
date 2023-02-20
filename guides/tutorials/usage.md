@@ -6,14 +6,18 @@ secrets in runtime.
 
 ### Install
 
-Just add it into your dependenciess like
+Just add it into your dependencies like
 ```elixir
 defp deps do
   [
-    {:secret_vault, github: "spawnfest/secret_vault"}
+    {:secret_vault, "~> 1.0"}
   ]
 end
 ```
+
+### Create priv dir
+
+Just create a `priv` directory in the root of your project
 
 ### Configure
 
@@ -25,10 +29,12 @@ import Config
 
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
+
+# Here `default` is a name of a default prefix. Prefixes work like namespaces for secrets.
 ```
 
-Here `default` is a name of a default prefix. Prefixes work like
-namespaces for secrets. You can provide options other than
+
+You can provide options other than
 `password`. To see a full list of those check out the
 `SecretVault.Config.new/2` documentation.
 
@@ -118,13 +124,36 @@ If you want to have you options in application env you can specify
 this in `config.exs`
 
 ```elixir
+# in config/config.exs
 import Config
 
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 
+# in application.ex start function
 {:ok, config} = SecretVault.Config.fetch_from_current_env(:my_app)
 SecretVault.Storage.to_application_env(config)
+```
+
+### Runtime configuration
+
+It is a common practice to configure application in configuration scripts like `config/config.exs`, `config/dev.exs` and `config/runtime.exs`. And there are two things
+a developer must keep in mind while working with them
+
+First of all, you **must not** use compile time configuration scritps (basically everything except `runtime.exs`) for setting values from secrets, since these values will appear in `app.src` file in your `_build` or release ebin directory. Usually, this is not something you can tolerate
+
+Second, `runtime.exs` config will be called during initialization of your project and the enviroment of the project will be inherited from the enviroment which was during project compilation. This means, that for release created with `MIX_ENV=dev mix release` and called with
+`MIX_ENV=prod myapp start`, secrets (and all other configuration) will be fetched from `dev` enviroment.
+
+So, to configure secrets in runtime, you can write something like:
+
+```
+# in config/runtime.exs
+import Config
+import SecretVault, only: [runtime_secret!: 2]
+
+config :playground, MyApp.Repo,
+  password: runtime_secret(:playground, "database_password")
 ```
 
 ### Release
